@@ -1,11 +1,37 @@
 import pandas as pd
 import pyautogui as pyg
+import PySimpleGUI as psg
+import xlrd, os
 from time import sleep
 
-df = pd.read_excel('lista_pagamento.xlsx')
 
-sleep(1)
+working_directory = os.getcwd()
 
+#simple GUI interface
+layout = [
+    [psg.Text('Abrir arquivo:'), psg.InputText(key="-FILE_PATH-"), psg.FileBrowse(initial_folder=working_directory, file_types = [("CSV File", "xlsx")])],
+    [psg.Button('->'), psg.Exit()]
+]
+
+window = psg.Window("PagAUTO", layout, keep_on_top=True)
+
+#take the file in the directory and turn in to a dataframe
+def get_df(file_address):
+    df = pd.read_excel(file_address)
+    return df
+
+#main loop
+while True:
+    event, values = window.read()
+    if event in (psg.WIN_CLOSED, 'Exit'):
+        exit()
+    
+    elif event == "->":
+        file_address = values["-FILE_PATH-"]
+        print(get_df(file_address))
+         
+window.close()
+         
 def cad_doc():  
     pyg.click(704,77) #click em incluir
     sleep(0.3)
@@ -60,8 +86,7 @@ def cad_doc():
     else:
         log_erro()
         pyg.click(1046,181, duration=0.5)
-        
-        
+              
 def cad_parc():
     pyg.click(111,157, duration=0.5)
     sleep(0.3)
